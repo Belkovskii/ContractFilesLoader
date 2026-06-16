@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace ContractLoader
 {
-    public class ExcelRecord
+    public struct ExcelRecord
     {
-        public string? FileGuid {  get; set; }
+        public string? FileGuid { get; set; }
         public string? DocumentGuid { get; set; }
         public string? PathToFile { get; set; }
         public string? FileModifiedDate { get; set; }
-        public string? FileModifiedUser { get; set; }        
-        
+        public string? FileModifiedUser { get; set; }
+        public string? LoadResult { get; set; }
+
     }
+
 }

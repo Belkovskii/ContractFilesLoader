@@ -8,6 +8,6 @@ namespace ContractLoader.Interfaces
 {
     public interface IExcelParser
     {
-        public ExcelRecord[] Parse(string path);
+        public List<ExcelRecord> Parse();
     }
 }
