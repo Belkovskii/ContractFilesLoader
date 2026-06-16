@@ -4,17 +4,21 @@ using ContractLoader.ExcelParser;
 using ContractLoader.Interfaces;
 using System.Collections.Concurrent;
 
-ExcelParseHelper parser = new("C:\\xlsx_files\\январь-декабрь2026.xlsx");
-Proceed(parser);
 
-static void Proceed(IExcelParser parser)
+using (ExcelParseHelper parser = new("C:\\xlsx_files\\январь-декабрь2026.xlsx"))
 {
+    await Proceed(parser);
+}
+
+static async Task Proceed(ExcelParseHelper parser)
+{
+    var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 50};
        
     var excelRecords = parser.Parse();
     
     var resultsConcurrentDictionary = new ConcurrentDictionary<string, string>();
 
-    Parallel.ForEach(excelRecords, async excelRecord =>
+    await Parallel.ForEachAsync(excelRecords, parallelOptions, async (excelRecord, cancellationToken) =>
     {
         if (excelRecord.FileGuid is string)
         {
@@ -22,14 +26,13 @@ static void Proceed(IExcelParser parser)
             resultsConcurrentDictionary.TryAdd(excelRecord.FileGuid, processResult);
         }        
     });
-
     
-
+    parser.UpdateRecords(resultsConcurrentDictionary);
 }
 
 static async Task<string> ProcessRecord(ExcelRecord record)
 {
-
-    return "";
+    //TODO
+    return "success";
 }
 
