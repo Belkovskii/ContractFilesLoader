@@ -21,17 +21,20 @@ class Program
     };
     static async Task Main(string[] args)
     {
-        //using (ExcelParseHelper parser = new("C:\\xlsx_files\\январь-декабрь2026.xlsx"))
-        //{
-        //    await Proceed(parser);
-        //}
+        using (ExcelParseHelper parser = new("C:\\xlsx_files\\январь-декабрь2026.xlsx"))
+        {
+            await Proceed(parser);
+        }
+
         //await Test(_httpClient);
     }
 
     static async Task Test(HttpClient httpClient)
     {
-        var isContractInSystem = await CheckContractUseCase.CheckIfContractInSystem(_httpClient, "0ccc9496-f029-11ee-a342-005056ae7f7f");
-        Console.WriteLine($"result: {isContractInSystem}");
+        // var isContractInSystem = await CheckContractUseCase.CheckIfContractInSystem(_httpClient, "0ccc9496-f029-11ee-a342-005056ae7f7f");
+        // Console.WriteLine($"result: {isContractInSystem}");
+        var isInSystem = await CheckFileUseCase.CheckIfFileInSystem(_httpClient, "53f9df17-ef2e-11f0-a35e-005056ae7f7f");
+        Console.WriteLine($"is in system: {isInSystem}");
     }
     
     static async Task Proceed(ExcelParseHelper parser)
@@ -54,6 +57,7 @@ class Program
         parser.UpdateRecords(resultsConcurrentDictionary);
     }
     
+    
     static async Task<string> ProcessRecord(ExcelRecord record)
     {
         try
@@ -63,7 +67,7 @@ class Program
             {
                 return "error: no contract found in system";
             }
-            var isFileAlreadyLoaded = await checkIfFileAlreadyLoaded(record.DocumentGuid);
+            var isFileAlreadyLoaded = await CheckFileUseCase.CheckIfFileInSystem(_httpClient, record.DocumentGuid);
             if (isFileAlreadyLoaded)
             {
                 return "error: file isalready loaded";
