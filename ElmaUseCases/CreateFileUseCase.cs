@@ -35,6 +35,11 @@ namespace ContractLoader.ElmaUseCases
         [JsonProperty("FileCreatedDate1C")]
         public string FileCreatedDate1C { get; set; }
         
+    }
 
+    public class RootObject
+    {
+        [JsonProperty("context")]
+        public CreateFilePayload context { get; set; }
     }
 }

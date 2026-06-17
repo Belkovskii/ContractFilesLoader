@@ -72,7 +72,7 @@ class Program
             {
                 return "error: file isalready loaded";
             }
-            var uploadResult = uploadContractFile(record);
+            var uploadResult = uploadContractFile(record, );
             if (uploadResult.isSuccess)
             {
                 return $"success: new file record id = {uploadResult.newRecordId}";
