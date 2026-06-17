@@ -1,18 +1,39 @@
 ﻿
 using ContractLoader;
+using ContractLoader.ElmaUseCases;
 using ContractLoader.ExcelParser;
 using System.Collections.Concurrent;
+using System.Net;
+using System.Net.Http.Headers;
 
 class Program
 {
-    static async void Main(string[] args)
+    private static readonly string bearerToken = "bcf83280-631c-4ce6-8bf2-70cd49d79faa";
+
+    private static readonly HttpClient _httpClient = new()
     {
-        using (ExcelParseHelper parser = new("C:\\xlsx_files\\январь-декабрь2026.xlsx"))
+        BaseAddress = new Uri("https://l42bom5pymlbs.elma365.ru/"),
+        Timeout = TimeSpan.FromSeconds(30),
+        DefaultRequestHeaders =
         {
-            await Proceed(parser);
+            Authorization = new AuthenticationHeaderValue("Bearer", bearerToken)
         }
+    };
+    static async Task Main(string[] args)
+    {
+        //using (ExcelParseHelper parser = new("C:\\xlsx_files\\январь-декабрь2026.xlsx"))
+        //{
+        //    await Proceed(parser);
+        //}
+        //await Test(_httpClient);
     }
 
+    static async Task Test(HttpClient httpClient)
+    {
+        var isContractInSystem = await CheckContractUseCase.CheckIfContractInSystem(_httpClient, "0ccc9496-f029-11ee-a342-005056ae7f7f");
+        Console.WriteLine($"result: {isContractInSystem}");
+    }
+    
     static async Task Proceed(ExcelParseHelper parser)
     {
         var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 50 };
@@ -32,13 +53,38 @@ class Program
 
         parser.UpdateRecords(resultsConcurrentDictionary);
     }
-
+    
     static async Task<string> ProcessRecord(ExcelRecord record)
     {
-        //TODO
-        return "success";
-    }
+        try
+        {
+            var contractId = await CheckContractUseCase.CheckIfContractInSystem(_httpClient, record.FileGuid);
+            if (string.IsNullOrEmpty(contractId))
+            {
+                return "error: no contract found in system";
+            }
+            var isFileAlreadyLoaded = await checkIfFileAlreadyLoaded(record.DocumentGuid);
+            if (isFileAlreadyLoaded)
+            {
+                return "error: file isalready loaded";
+            }
+            var uploadResult = uploadContractFile(record);
+            if (uploadResult.isSuccess)
+            {
+                return $"success: new file record id = {uploadResult.newRecordId}";
+            }
+            else
+            {
+                return $"error: {uploadResult.errorMessage}";
+            }
 
+        }
+        catch (Exception ex)
+        {
+            return $"error: {ex.Message}";
+        }        
+    }
+    
 }
 
 
