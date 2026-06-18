@@ -1,11 +1,6 @@
 ﻿using ContractLoader.Models;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ContractLoader.ElmaUseCases
 {
@@ -15,6 +10,23 @@ namespace ContractLoader.ElmaUseCases
         {
             string pathToFile = parseFilePath(excelRecord.PathToFile);
             FileAttachment fileAttachment = await loadFileFromPath(pathToFile);
+            string payloadJson = getCreateFileRequestPayload(fileAttachment, excelRecord, contractId);
+            var url = "pub/v1/app/dogovor/OtherFiles/create";
+            var content = new StringContent(payloadJson, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await httpClient.PostAsync(url, content);
+            if (response.IsSuccessStatusCode)
+            {
+                string newRecordId = getNewRecordId(response);
+                return (true, "ok");
+            }
+            else
+            {
+                return (false, "error");
+            }
+        }
+
+        private static string getCreateFileRequestPayload(FileAttachment fileAttachment, ExcelRecord excelRecord, string contractId)
+        {
             CreateFilePayload payload = new()
             {
                 File = [fileAttachment],
@@ -25,9 +37,12 @@ namespace ContractLoader.ElmaUseCases
             if (excelRecord.FileModifiedUser is not null) payload.FileGUIDFrom1C = excelRecord.FileModifiedUser;
             if (excelRecord.Author is not null) payload.FileCreatedUser = excelRecord.Author;
             if (excelRecord.CreationDate is not null) payload.FileChangeDateFrom1C = excelRecord.CreationDate;
-
-            
-            return (true, "");
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.None
+            };            
+            return JsonConvert.SerializeObject(payload, jsonSerializerSettings);
         }
     }
 
