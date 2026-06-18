@@ -5,7 +5,7 @@
         public static async Task<string> GetAuthToken(LoginAuthDataSet dataSet)
         {
             LoginClient loginClient = new(dataSet.host, dataSet.client);
-            var token = loginClient.LoginAndGetToken(dataSet.username, dataSet.userPassword);
+            var token = await loginClient.LoginAndGetToken(dataSet.username, dataSet.userPassword);
             if (token == null || token.Length < 5)
             {
                 Console.WriteLine("Не удалось получить токен");

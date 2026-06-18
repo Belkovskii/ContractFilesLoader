@@ -38,9 +38,9 @@ namespace ContractLoader.FileLoader
                     request.Headers.Add(header.Key, header.Value);
                 }
             }
-            var response = await HttpClient.SendAsync(request).Result;
+            var response = await HttpClient.SendAsync(request);
             statusCode = response.StatusCode;
-            string responseContent = await response.Content.ReadAsStringAsync().Result;
+            string responseContent = await response.Content.ReadAsStringAsync();
             return responseContent;
         }
     }
