@@ -78,7 +78,7 @@ namespace ContractLoader.ElmaUseCases
             };
             if (excelRecord.DocumentGuid is not null) payload.FileGUIDFrom1C = excelRecord.DocumentGuid;
             if (excelRecord.FileModifiedDate is not null) payload.FileChangeDateFrom1C = excelRecord.FileModifiedDate;
-            if (excelRecord.FileModifiedUser is not null) payload.FileGUIDFrom1C = excelRecord.FileModifiedUser;
+            if (excelRecord.FileModifiedUser is not null) payload.FileModifiedUserFrom1C = excelRecord.FileModifiedUser;
             if (excelRecord.Author is not null) payload.FileCreatedUser = excelRecord.Author;
             if (excelRecord.CreationDate is not null) payload.FileChangeDateFrom1C = excelRecord.CreationDate;
             var jsonSerializerSettings = new JsonSerializerSettings
