@@ -18,7 +18,7 @@ namespace ContractLoader.FileLoader
 
         public Dictionary<string, string> Headers { get; set; } = [];
 
-        public string SendRequest(out HttpStatusCode statusCode)
+        public async Task<string> SendRequest(out HttpStatusCode statusCode)
         {
             using var request = new HttpRequestMessage(Method, Endpoint);
             StringContent? contentBody = null;
@@ -38,9 +38,9 @@ namespace ContractLoader.FileLoader
                     request.Headers.Add(header.Key, header.Value);
                 }
             }
-            var response = HttpClient.SendAsync(request).Result;
+            var response = await HttpClient.SendAsync(request).Result;
             statusCode = response.StatusCode;
-            string responseContent = response.Content.ReadAsStringAsync().Result;
+            string responseContent = await response.Content.ReadAsStringAsync().Result;
             return responseContent;
         }
     }

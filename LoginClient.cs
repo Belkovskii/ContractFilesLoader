@@ -1,6 +1,7 @@
 ﻿using ContractLoader.FileLoader;
 using Newtonsoft.Json;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace ContractLoader
 {
@@ -12,12 +13,12 @@ namespace ContractLoader
 
         private readonly HttpClient client = _client;
 
-        public string LoginAndGetToken(string username, string password)
+        public async Task<string> LoginAndGetToken(string username, string password)
         {
             string loginJson = JsonConvert.SerializeObject(new LoginPayload(username, password));
             string loginEndpoint = host + "/guard/login";
             CalloutManager loginCalloutManager = new(client, loginEndpoint, loginJson, "", HttpMethod.Post);
-            string logResponse = loginCalloutManager.SendRequest(out HttpStatusCode statusCode);
+            string logResponse = await loginCalloutManager.SendRequest(out HttpStatusCode statusCode);
             if (statusCode == HttpStatusCode.OK)
             {
                 ResponseJSON responseJson = JsonConvert.DeserializeObject<ResponseJSON>(logResponse) ?? new();

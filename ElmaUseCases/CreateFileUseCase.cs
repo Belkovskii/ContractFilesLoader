@@ -40,7 +40,7 @@ namespace ContractLoader.ElmaUseCases
                 if (response.IsSuccessStatusCode)
                 {
                     string newRecordIdOrError = await GetNewRecordIdOrError(response);
-                    return (newRecordIdOrError.Contains("error"), newRecordIdOrError);                        
+                    return (!newRecordIdOrError.Contains("error"), newRecordIdOrError);                        
                 }
                 else
                 {

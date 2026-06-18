@@ -9,14 +9,8 @@ namespace ContractLoader.FileLoader
     {
 
         private readonly HttpClient _httpClient = client;
-
-        private string uploadEndpoint = "";
-
         private readonly string _token = token;
-
         private readonly string _host = host;
-
-        private FileCreationModel _fileCreationModel = new();
 
         async public Task<(FileAttachment?, string)> GetFileBodyAndUpload(string pathToFile)
         {
@@ -24,29 +18,25 @@ namespace ContractLoader.FileLoader
             byte[] fileBody = File.ReadAllBytes(pathToFile);
             var (fileRecord, fileUploadError) = await UploadFile(fileBody, fileName);
             if (fileRecord is not null)
-            {
                 return (new FileAttachment(fileRecord), "success");
-            }
             else if (!string.IsNullOrEmpty(fileUploadError))
-            {
                 return (null, fileUploadError);
-            }
             else
-            {
                 return (null, "unknown error while uploading file");
-            }
         }
 
-        private void SendPutLinkRequest(byte[] fileBody, string fileName)
+        private async Task<(string uploadEndpoint, FileCreationModel fileModel)> SendPutLinkRequest(byte[] fileBody, string fileName)
         {
             string putLinkEndpoint = $"{_host}api/disk/files/putlink?size={fileBody.Length}";            
             CalloutManager cm = new(_httpClient, putLinkEndpoint, null, _token, HttpMethod.Get);
-            var putLinkRequestResult = cm.SendRequest(out HttpStatusCode statusCode);
+            var putLinkRequestResult = await cm.SendRequest(out HttpStatusCode statusCode);
             if (statusCode == HttpStatusCode.OK)
             {
                 try
                 {
                     FileLinkResponse fileLinkResponse = JsonConvert.DeserializeObject<FileLinkResponse>(putLinkRequestResult);
+                    string uploadEndpoint = "";
+                    FileCreationModel _fileCreationModel = new();
                     if (fileLinkResponse != null)
                     {
                         _fileCreationModel.size = fileBody.Length;
@@ -61,6 +51,7 @@ namespace ContractLoader.FileLoader
                         string link = fileLinkResponse.Link;
                         uploadEndpoint = link;
                     }
+                    return (uploadEndpoint, _fileCreationModel);
                 }
                 catch (Exception ex)
                 {
@@ -75,10 +66,14 @@ namespace ContractLoader.FileLoader
 
         public async Task<(FileCreationModel?, string)> UploadFile(byte[] fileBody, string fileName)
         {
+            string uploadEndpoint = "";
+            FileCreationModel fileCreationModel = new();
             var error = "";
             try
             {
-                SendPutLinkRequest(fileBody, fileName);
+                var(respUploadEndpoint, respFileModel) = await SendPutLinkRequest(fileBody, fileName);
+                uploadEndpoint = respUploadEndpoint;
+                fileCreationModel = respFileModel;
             }
             catch (Exception e)
             {
@@ -94,7 +89,7 @@ namespace ContractLoader.FileLoader
                 var response = await _httpClient.SendAsync(request);
                 response.EnsureSuccessStatusCode();
                 string responseContent = await response.Content.ReadAsStringAsync();
-                return (_fileCreationModel, error);
+                return (fileCreationModel, error);
             }
             catch (Exception ex)
             {
