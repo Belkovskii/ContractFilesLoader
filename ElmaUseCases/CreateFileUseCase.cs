@@ -6,6 +6,7 @@ namespace ContractLoader.ElmaUseCases
 {
     public class CreateFileUseCase
     {
+        /*
         public static async Task<(bool, string)> UploadContractFile(HttpClient httpClient, ExcelRecord excelRecord, string contractId)
         {
             string pathToFile = parseFilePath(excelRecord.PathToFile);
@@ -44,6 +45,7 @@ namespace ContractLoader.ElmaUseCases
             };            
             return JsonConvert.SerializeObject(payload, jsonSerializerSettings);
         }
+        */
     }
 
     public class CreateFilePayload
