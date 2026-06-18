@@ -1,9 +1,7 @@
-﻿
-using ContractLoader;
+﻿using ContractLoader;
 using ContractLoader.ElmaUseCases;
 using ContractLoader.ExcelParser;
 using System.Collections.Concurrent;
-using System.Net;
 using System.Net.Http.Headers;
 
 class Program
@@ -11,6 +9,8 @@ class Program
     private static GetAuthTokenUseCase.LoginAuthDataSet loginAuthDataSet;
     private static readonly HttpClient _httpClient;
     private static readonly string bearerToken;
+    private static readonly string pathToExcelFile;
+    private static readonly string pathToUploadFiles;
     static Program()
     {
         bearerToken = "bcf83280-631c-4ce6-8bf2-70cd49d79faa";
@@ -31,21 +31,17 @@ class Program
             userPassword = "Asz79!#58",
             isProd = false
         };
-
+        pathToExcelFile = "C:\\xlsx_files\\январь-декабрь2026.xlsx";
+        pathToUploadFiles = "C:\\files_to_uload_to_contracts";
     }
 
     static async Task Main(string[] args)
-    {       
+    {
         var authToken = await GetAuthTokenUseCase.GetAuthToken(loginAuthDataSet);
-        Console.WriteLine($"Логин и авторизация успешны, auth token: {authToken}");
+        using ExcelParseHelper parser = new(pathToExcelFile);
+        await Proceed(parser);
 
 
-
-
-        //using (ExcelParseHelper parser = new("C:\\xlsx_files\\январь-декабрь2026.xlsx"))
-        //{
-        //    await Proceed(parser);
-        //}
 
         //await Test(_httpClient);
     }
@@ -58,7 +54,7 @@ class Program
         Console.WriteLine($"is in system: {isInSystem}");
     }
 
-    /*
+    
     static async Task Proceed(ExcelParseHelper parser)
     {
         var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 50 };
@@ -94,14 +90,14 @@ class Program
             {
                 return "error: file isalready loaded";
             }
-            var uploadResult = uploadContractFile(_httpClient, record);
-            if (uploadResult.isSuccess)
+            (bool uploadResult, string message) = await CreateFileUseCase.UploadContractFile(_httpClient, record, contractId);
+            if (uploadResult)
             {
-                return $"success: new file record id = {uploadResult.newRecordId}";
+                return $"success: new file record id = {message}";
             }
             else
             {
-                return $"error: {uploadResult.errorMessage}";
+                return $"error: {message}";
             }
 
         }
@@ -110,7 +106,7 @@ class Program
             return $"error: {ex.Message}";
         }  
     }
-    */
+    
 
 
 

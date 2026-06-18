@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using static ContractLoader.ElmaUseCases.CheckContractUseCase;
 
 namespace ContractLoader.ElmaUseCases
 {
@@ -24,7 +19,7 @@ namespace ContractLoader.ElmaUseCases
                 {
                     return apiResponse.result.total > 0;
                 }
-            }            
+            }
             return false;
         }
 

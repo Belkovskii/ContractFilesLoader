@@ -1,4 +1,5 @@
-﻿using ContractLoader.Models;
+﻿using ContractLoader.ExcelParser;
+using ContractLoader.Models;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -6,10 +7,14 @@ namespace ContractLoader.ElmaUseCases
 {
     public class CreateFileUseCase
     {
-        /*
-        public static async Task<(bool, string)> UploadContractFile(HttpClient httpClient, ExcelRecord excelRecord, string contractId)
+        
+        public static async Task<(bool, string)> UploadContractFile(HttpClient httpClient, ExcelRecord excelRecord, string contractId, string generalPathToFiles)
         {
-            string pathToFile = parseFilePath(excelRecord.PathToFile);
+            if (excelRecord.PathToFile is not string)
+            {
+                return (false, "no path to file in excel row");
+            }
+            string pathToFile = PathParser.GetPathToFile(generalPathToFiles, excelRecord.PathToFile);
             FileAttachment fileAttachment = await loadFileFromPath(pathToFile);
             string payloadJson = getCreateFileRequestPayload(fileAttachment, excelRecord, contractId);
             var url = "pub/v1/app/dogovor/OtherFiles/create";
@@ -45,7 +50,7 @@ namespace ContractLoader.ElmaUseCases
             };            
             return JsonConvert.SerializeObject(payload, jsonSerializerSettings);
         }
-        */
+        
     }
 
     public class CreateFilePayload
