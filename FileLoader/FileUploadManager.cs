@@ -21,6 +21,25 @@ namespace ContractLoader.FileLoader
 
         private FileCreationModel _fileCreationModel = new();
 
+        async public Task<(FileAttachment?, string)> GetFileBodyAndUpload(string pathToFile)
+        {
+            string fileName = Path.GetFileName(pathToFile);
+            byte[] fileBody = File.ReadAllBytes(pathToFile);
+            var (fileRecord, fileUploadError) = await UploadFile(fileBody, fileName);
+            if (fileRecord is not null)
+            {
+                return (new FileAttachment(fileRecord), "success");
+            }
+            else if (!string.IsNullOrEmpty(fileUploadError))
+            {
+                return (null, fileUploadError);
+            }
+            else
+            {
+                return (null, "unknown error while uploading file");
+            }
+        }
+
         private void SendPutLinkRequest(byte[] fileBody, string fileName)
         {
             string putLinkEndpoint = $"{_host}api/disk/files/putlink?size={fileBody.Length}";            
