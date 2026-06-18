@@ -47,9 +47,11 @@ namespace ContractLoader.ExcelParser
                     {
                         FileGuid = row.Cell(2).Value.ToString(),
                         DocumentGuid = row.Cell(4).Value.ToString(),
+                        Author = row.Cell(10).Value.ToString(),
+                        CreationDate = row.Cell(12).Value.ToString(),
                         FileModifiedDate = row.Cell(17).Value.ToString(),
                         PathToFile = row.Cell(21).Value.ToString(),
-                        FileModifiedUser = row.Cell(27).Value.ToString()
+                        FileModifiedUser = row.Cell(27).Value.ToString(),                        
                     };
                     excelRecords.Add(record);
                 }

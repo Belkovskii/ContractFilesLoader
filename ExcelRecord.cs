@@ -14,6 +14,8 @@ namespace ContractLoader
         public string? FileModifiedDate { get; set; }
         public string? FileModifiedUser { get; set; }
         public string? LoadResult { get; set; }
+        public string? Author { get; set; }
+        public string? CreationDate { get; set; }
     }
 
 }
