@@ -11,9 +11,11 @@ class Program
     private static readonly string bearerToken;
     private static readonly string pathToExcelFile;
     private static readonly string pathToUploadFiles;
+    private static readonly string _host;
     static Program()
     {
         bearerToken = "bcf83280-631c-4ce6-8bf2-70cd49d79faa";
+        _host = "https://l42bom5pymlbs.elma365.ru/";
         _httpClient = new()
         {
             BaseAddress = new Uri("https://l42bom5pymlbs.elma365.ru/"),
@@ -25,7 +27,7 @@ class Program
         };
         loginAuthDataSet = new()
         {
-            host = "https://l42bom5pymlbs.elma365.ru/",
+            host = _host,
             client = _httpClient,
             username = "denis.belkovsky@masterdata.ru",
             userPassword = "Asz79!#58",
@@ -33,13 +35,14 @@ class Program
         };
         pathToExcelFile = "C:\\xlsx_files\\январь-декабрь2026.xlsx";
         pathToUploadFiles = "C:\\files_to_uload_to_contracts";
+        
     }
 
     static async Task Main(string[] args)
     {
         var authToken = await GetAuthTokenUseCase.GetAuthToken(loginAuthDataSet);
         using ExcelParseHelper parser = new(pathToExcelFile);
-        await Proceed(parser);
+        await Proceed(parser, authToken);
 
 
 
@@ -55,7 +58,7 @@ class Program
     }
 
     
-    static async Task Proceed(ExcelParseHelper parser)
+    static async Task Proceed(ExcelParseHelper parser, string authToken)
     {
         var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 50 };
 
@@ -67,7 +70,7 @@ class Program
         {
             if (excelRecord.FileGuid is string)
             {
-                var processResult = await ProcessRecord(excelRecord);
+                var processResult = await ProcessRecord(excelRecord, authToken);
                 resultsConcurrentDictionary.TryAdd(excelRecord.FileGuid, processResult);
             }
         });
@@ -76,7 +79,7 @@ class Program
     }
     
     
-    static async Task<string> ProcessRecord(ExcelRecord record)
+    static async Task<string> ProcessRecord(ExcelRecord record, string authToken)
     {
         try
         {
@@ -90,7 +93,8 @@ class Program
             {
                 return "error: file isalready loaded";
             }
-            (bool uploadResult, string message) = await CreateFileUseCase.UploadContractFile(_httpClient, record, contractId);
+            FileUploadData fileUploadData = new(_httpClient, record, contractId, pathToUploadFiles, _host, authToken);
+            (bool uploadResult, string message) = await CreateFileUseCase.UploadContractFile(fileUploadData);
             if (uploadResult)
             {
                 return $"success: new file record id = {message}";

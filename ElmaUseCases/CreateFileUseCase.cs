@@ -1,34 +1,72 @@
 ﻿using ContractLoader.ExcelParser;
+using ContractLoader.FileLoader;
 using ContractLoader.Models;
 using Newtonsoft.Json;
 using System.Text;
+using System.Text.Json.Serialization;
+using System.Timers;
+using static ContractLoader.ElmaUseCases.CheckContractUseCase;
 
 namespace ContractLoader.ElmaUseCases
 {
+    public record struct FileUploadData(
+        HttpClient httpClient,
+        ExcelRecord excelRecord,
+        string contractId,
+        string generalPathToFiles,
+        string host,
+        string token
+    );
+
     public class CreateFileUseCase
     {
         
-        public static async Task<(bool, string)> UploadContractFile(HttpClient httpClient, ExcelRecord excelRecord, string contractId, string generalPathToFiles)
+        public static async Task<(bool, string)> UploadContractFile(FileUploadData fileUploadData)
         {
+            var(httpClient, excelRecord, contractId, generalPathToFiles, host, token) = fileUploadData;
             if (excelRecord.PathToFile is not string)
             {
                 return (false, "no path to file in excel row");
             }
             string pathToFile = PathParser.GetPathToFile(generalPathToFiles, excelRecord.PathToFile);
-            FileAttachment fileAttachment = await loadFileFromPath(pathToFile);
-            string payloadJson = getCreateFileRequestPayload(fileAttachment, excelRecord, contractId);
-            var url = "pub/v1/app/dogovor/OtherFiles/create";
-            var content = new StringContent(payloadJson, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await httpClient.PostAsync(url, content);
-            if (response.IsSuccessStatusCode)
+            FileUploadManager fileLoader = new(httpClient, token, host);
+            (FileAttachment? fileAttachment, string resultMessage) = await fileLoader.GetFileBodyAndUpload(pathToFile);
+            if (fileAttachment is not null)
             {
-                string newRecordId = getNewRecordId(response);
-                return (true, "ok");
+                string payloadJson = getCreateFileRequestPayload(fileAttachment, excelRecord, contractId);
+                var url = "pub/v1/app/dogovor/OtherFiles/create";
+                var content = new StringContent(payloadJson, Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await httpClient.PostAsync(url, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    string newRecordIdOrError = await GetNewRecordIdOrError(response);
+                    return (newRecordIdOrError.Contains("error"), newRecordIdOrError);                        
+                }
+                else
+                {
+                    return (false, "error");
+                }
             }
             else
             {
-                return (false, "error");
+                return (false, resultMessage);
             }
+        }
+
+        private static async Task<string> GetNewRecordIdOrError(HttpResponseMessage response)
+        {
+            string responseContent = await response.Content.ReadAsStringAsync();
+            var apiResponse = JsonConvert.DeserializeObject<FileUploadApiResponse>(responseContent);
+            if (apiResponse is null) return "error: could not parse response offile upload";
+            if (apiResponse.Success)
+            {
+                return apiResponse.Item.Id;
+            }
+            else
+            {
+                return apiResponse.Error;
+            }
+            
         }
 
         private static string getCreateFileRequestPayload(FileAttachment fileAttachment, ExcelRecord excelRecord, string contractId)
@@ -82,5 +120,19 @@ namespace ContractLoader.ElmaUseCases
     {
         [JsonProperty("context")]
         public CreateFilePayload context { get; set; }
+    }
+
+    public class FileUploadApiItemResponse
+    {
+        [JsonPropertyName("__id")]
+        public string Id { get; set; }
+    }
+
+
+    public class FileUploadApiResponse
+    {
+        public bool Success { get; set; }
+        public string Error { get; set; }
+        public FileUploadApiItemResponse Item { get; set; }
     }
 }
