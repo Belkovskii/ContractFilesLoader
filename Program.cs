@@ -43,29 +43,13 @@ class Program
         var authToken = await GetAuthTokenUseCase.GetAuthToken(loginAuthDataSet);
         using ExcelParseHelper parser = new(pathToExcelFile);
         await Proceed(parser, authToken);
-
-
-
-        //await Test(_httpClient);
     }
-
-    static async Task Test(HttpClient httpClient)
-    {
-        // var isContractInSystem = await CheckContractUseCase.CheckIfContractInSystem(_httpClient, "0ccc9496-f029-11ee-a342-005056ae7f7f");
-        // Console.WriteLine($"result: {isContractInSystem}");
-        var isInSystem = await CheckFileUseCase.CheckIfFileInSystem(_httpClient, "53f9df17-ef2e-11f0-a35e-005056ae7f7f");
-        Console.WriteLine($"is in system: {isInSystem}");
-    }
-
     
     static async Task Proceed(ExcelParseHelper parser, string authToken)
     {
         var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 50 };
-
         var excelRecords = parser.Parse();
-
         var resultsConcurrentDictionary = new ConcurrentDictionary<string, string>();
-
         await Parallel.ForEachAsync(excelRecords, parallelOptions, async (excelRecord, cancellationToken) =>
         {
             if (excelRecord.FileGuid is string)
@@ -74,7 +58,6 @@ class Program
                 resultsConcurrentDictionary.TryAdd(excelRecord.FileGuid, processResult);
             }
         });
-
         parser.UpdateRecords(resultsConcurrentDictionary);
     }
     
@@ -103,7 +86,6 @@ class Program
             {
                 return $"error: {message}";
             }
-
         }
         catch (Exception ex)
         {
@@ -111,9 +93,6 @@ class Program
         }  
     }
     
-
-
-
 }
 
 

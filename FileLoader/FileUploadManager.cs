@@ -7,13 +7,10 @@ namespace ContractLoader.FileLoader
 {
     public class FileUploadManager(HttpClient client, string token, string host)
     {
-        private const string questionMark = "?";
 
         private readonly HttpClient _httpClient = client;
 
         private string uploadEndpoint = "";
-
-        private string FileId = "";
 
         private readonly string _token = token;
 
@@ -60,9 +57,7 @@ namespace ContractLoader.FileLoader
                         _fileCreationModel.__currentUserPermissions = [];
                         _fileCreationModel.__id = fileLinkResponse.Hash;
                         _fileCreationModel.__subscribers = [];
-                        _fileCreationModel.__updatedAt = DateTime.Now;
-                        string fileId = fileLinkResponse.Hash;
-                        FileId = fileId;
+                        _fileCreationModel.__updatedAt = DateTime.Now;                        
                         string link = fileLinkResponse.Link;
                         uploadEndpoint = link;
                     }
