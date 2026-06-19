@@ -18,7 +18,7 @@ namespace ContractLoader
             string loginJson = JsonConvert.SerializeObject(new LoginPayload(username, password));
             string loginEndpoint = host + "/guard/login";
             CalloutManager loginCalloutManager = new(client, loginEndpoint, loginJson, "", HttpMethod.Post);
-            string logResponse = await loginCalloutManager.SendRequest(out HttpStatusCode statusCode);
+            (string logResponse, HttpStatusCode statusCode) = await loginCalloutManager.SendRequest();
             if (statusCode == HttpStatusCode.OK)
             {
                 ResponseJSON responseJson = JsonConvert.DeserializeObject<ResponseJSON>(logResponse) ?? new();

@@ -29,7 +29,7 @@ namespace ContractLoader.FileLoader
         {
             string putLinkEndpoint = $"{_host}api/disk/files/putlink?size={fileBody.Length}";            
             CalloutManager cm = new(_httpClient, putLinkEndpoint, null, _token, HttpMethod.Get);
-            var putLinkRequestResult = await cm.SendRequest(out HttpStatusCode statusCode);
+            (string putLinkRequestResult, HttpStatusCode statusCode) = await cm.SendRequest();
             if (statusCode == HttpStatusCode.OK)
             {
                 try

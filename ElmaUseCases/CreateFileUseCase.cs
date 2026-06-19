@@ -20,10 +20,10 @@ namespace ContractLoader.ElmaUseCases
 
     public class CreateFileUseCase
     {
-        
+
         public static async Task<(bool, string)> UploadContractFile(FileUploadData fileUploadData)
         {
-            var(httpClient, excelRecord, contractId, generalPathToFiles, host, token) = fileUploadData;
+            var (httpClient, excelRecord, contractId, generalPathToFiles, host, token) = fileUploadData;
             if (excelRecord.PathToFile is not string)
             {
                 return (false, "no path to file in excel row");
@@ -40,7 +40,7 @@ namespace ContractLoader.ElmaUseCases
                 if (response.IsSuccessStatusCode)
                 {
                     string newRecordIdOrError = await GetNewRecordIdOrError(response);
-                    return (!newRecordIdOrError.Contains("error"), newRecordIdOrError);                        
+                    return (!newRecordIdOrError.Contains("error"), newRecordIdOrError);
                 }
                 else
                 {
@@ -66,7 +66,7 @@ namespace ContractLoader.ElmaUseCases
             {
                 return apiResponse.Error;
             }
-            
+
         }
 
         private static string getCreateFileRequestPayload(FileAttachment fileAttachment, ExcelRecord excelRecord, string contractId)
@@ -81,14 +81,21 @@ namespace ContractLoader.ElmaUseCases
             if (excelRecord.FileModifiedUser is not null) payload.FileModifiedUserFrom1C = excelRecord.FileModifiedUser;
             if (excelRecord.Author is not null) payload.FileCreatedUser = excelRecord.Author;
             if (excelRecord.CreationDate is not null) payload.FileChangeDateFrom1C = excelRecord.CreationDate;
+            CreateFilePayloadRoot payloadRoot = new() { Context = payload };
             var jsonSerializerSettings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
                 Formatting = Formatting.None
-            };            
-            return JsonConvert.SerializeObject(payload, jsonSerializerSettings);
+            };
+            return JsonConvert.SerializeObject(payloadRoot, jsonSerializerSettings);
         }
-        
+
+    }
+
+    public class CreateFilePayloadRoot
+    {
+        [JsonProperty("context")]
+        public CreateFilePayload Context {get; set;}
     }
 
     public class CreateFilePayload

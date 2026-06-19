@@ -4,7 +4,7 @@
     {
         public static string GetPathToFile(string generalPath, string path)
         {
-            return generalPath + path;
+            return generalPath + "\\" + path;
         }
 
     }
