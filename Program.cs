@@ -50,23 +50,24 @@ class Program
         var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 50 };
         var excelRecords = parser.Parse();
         var resultsConcurrentDictionary = new ConcurrentDictionary<string, string>();
-        foreach (var excelRecord in excelRecords)
-        {
-            if (excelRecord.FileGuid is string)
-            {
-                var processResult = await ProcessRecord(excelRecord, authToken);
-                resultsConcurrentDictionary.TryAdd(excelRecord.FileGuid, processResult);
-            }
-        }
-        //await Parallel.ForEachAsync(excelRecords, parallelOptions, async (excelRecord, cancellationToken) =>
+        //foreach (var excelRecord in excelRecords)
         //{
         //    if (excelRecord.FileGuid is string)
         //    {
         //        var processResult = await ProcessRecord(excelRecord, authToken);
         //        resultsConcurrentDictionary.TryAdd(excelRecord.FileGuid, processResult);
         //    }
-        //});
+        //}
+        await Parallel.ForEachAsync(excelRecords, parallelOptions, async (excelRecord, cancellationToken) =>
+        {
+            if (excelRecord.FileGuid is string)
+            {
+                var processResult = await ProcessRecord(excelRecord, authToken);
+                resultsConcurrentDictionary.TryAdd(excelRecord.FileGuid, processResult);
+            }
+        });
         parser.UpdateRecords(resultsConcurrentDictionary);
+        Console.ReadKey();
     }
     
     

@@ -135,20 +135,20 @@ namespace ContractLoader.ElmaUseCases
 
     public class FileUploadApiItemResponse
     {
-        [JsonPropertyName("__id")]
+        [JsonProperty("__id")]
         public string Id { get; set; }
     }
 
 
     public class FileUploadApiResponse
     {
-        [JsonPropertyName("success")]
+        [JsonProperty("success")]
         public bool Success { get; set; }
 
-        [JsonPropertyName("error")]
+        [JsonProperty("error")]
         public string Error { get; set; }
         
-        [JsonPropertyName("item")]
+        [JsonProperty("item")]
         public FileUploadApiItemResponse Item { get; set; }
     }
 }

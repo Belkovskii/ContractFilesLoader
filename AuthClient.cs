@@ -23,10 +23,8 @@ namespace ContractLoader
             {
                 cookieContainer.Add(baseAddress, new Cookie("vtoken", loginToken));
             }
-            HttpResponseMessage response = await client.GetAsync(baseAddress);
-            Console.WriteLine($"Auth response status code: {response.StatusCode}");
+            HttpResponseMessage response = await client.GetAsync(baseAddress);            
             string resultText = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"resultText: {resultText}");
             HttpHeaders headers = response.Headers;
             if (!isProd)
             {                
