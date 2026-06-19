@@ -81,6 +81,7 @@ namespace ContractLoader.ElmaUseCases
             if (excelRecord.FileModifiedUser is not null) payload.FileModifiedUserFrom1C = excelRecord.FileModifiedUser;
             if (excelRecord.Author is not null) payload.FileCreatedUser = excelRecord.Author;
             if (excelRecord.CreationDate is not null) payload.FileChangeDateFrom1C = excelRecord.CreationDate;
+            if (excelRecord.PathToFile is not null) payload.Name = Path.GetFileName(excelRecord.PathToFile);
             CreateFilePayloadRoot payloadRoot = new() { Context = payload };
             var jsonSerializerSettings = new JsonSerializerSettings
             {
@@ -100,6 +101,9 @@ namespace ContractLoader.ElmaUseCases
 
     public class CreateFilePayload
     {
+        [JsonProperty("__name")]
+        public string Name { get; set; }
+
         [JsonProperty(nameof(FileGUIDFrom1C))]
         public string? FileGUIDFrom1C { get; set; }
 
@@ -138,8 +142,13 @@ namespace ContractLoader.ElmaUseCases
 
     public class FileUploadApiResponse
     {
+        [JsonPropertyName("success")]
         public bool Success { get; set; }
+
+        [JsonPropertyName("error")]
         public string Error { get; set; }
+        
+        [JsonPropertyName("item")]
         public FileUploadApiItemResponse Item { get; set; }
     }
 }
