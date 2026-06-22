@@ -82,7 +82,7 @@ namespace ContractLoader.ElmaUseCases
             if (excelRecord.FileModifiedUser is not null) payload.FileModifiedUserFrom1C = excelRecord.FileModifiedUser;
             if (excelRecord.Author is not null) payload.FileCreatedUser = excelRecord.Author;
             if (excelRecord.CreationDate is not null) payload.FileCreatedDate1C = excelRecord.CreationDate;
-            if (excelRecord.PathToFile is not null) payload.Name = Path.GetFileName(excelRecord.PathToFile);
+            if (excelRecord.RecordName is not null) payload.Name = excelRecord.RecordName;
             CreateFilePayloadRoot payloadRoot = new() { Context = payload };
             var jsonSerializerSettings = new JsonSerializerSettings
             {

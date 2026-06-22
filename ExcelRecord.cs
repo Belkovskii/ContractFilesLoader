@@ -10,6 +10,11 @@
         public string? LoadResult { get; set; }
         public string? Author { get; set; }
         public string? CreationDate { get; set; }
+        public string? RecordName { get; set; }
+        public string? FullFileName1C { get; set; }
+        public string? ApproverUser1C { get; set;}
+        public string? FileType1C { get; set; }
+        public string? CurrentFileModifiedBy { get;set; }
     }
 
 }
