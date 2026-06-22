@@ -83,6 +83,11 @@ namespace ContractLoader.ElmaUseCases
             if (excelRecord.Author is not null) payload.FileCreatedUser = excelRecord.Author;
             if (excelRecord.CreationDate is not null) payload.FileCreatedDate1C = excelRecord.CreationDate;
             if (excelRecord.RecordName is not null) payload.Name = excelRecord.RecordName;
+            if (excelRecord.ApproverUser1C is not null) payload.ApproverUser1C = excelRecord.ApproverUser1C;
+            if (excelRecord.FileType1C is not null) payload.FileType1C = excelRecord.FileType1C;
+            if (excelRecord.FullFileName1C is not null) payload.FullFileName1C = excelRecord.FullFileName1C;
+            if (excelRecord.CurrentFileModifiedBy is not null) payload.CurrentFileModifiedBy = excelRecord.CurrentFileModifiedBy;
+   
             CreateFilePayloadRoot payloadRoot = new() { Context = payload };
             var jsonSerializerSettings = new JsonSerializerSettings
             {
@@ -125,7 +130,19 @@ namespace ContractLoader.ElmaUseCases
 
         [JsonProperty(nameof(FileCreatedDate1C))]
         public string? FileCreatedDate1C { get; set; }
-        
+
+        [JsonProperty(nameof(FullFileName1C))]
+        public string? FullFileName1C { get; set; }
+
+        [JsonProperty(nameof(ApproverUser1C))]
+        public string? ApproverUser1C { get; set; }
+
+        [JsonProperty(nameof(FileType1C))]
+        public string? FileType1C { get; set; }
+
+        [JsonProperty(nameof(CurrentFileModifiedBy))]
+        public string? CurrentFileModifiedBy { get; set; }
+
     }
 
     public class RootObject
