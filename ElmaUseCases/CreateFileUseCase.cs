@@ -60,6 +60,7 @@ namespace ContractLoader.ElmaUseCases
             if (apiResponse is null) return "error: could not parse response offile upload";
             if (apiResponse.Success)
             {
+                Console.WriteLine($"new record id: {apiResponse.Item.Id}");
                 return apiResponse.Item.Id;
             }
             else
@@ -80,7 +81,7 @@ namespace ContractLoader.ElmaUseCases
             if (excelRecord.FileModifiedDate is not null) payload.FileChangeDateFrom1C = excelRecord.FileModifiedDate;
             if (excelRecord.FileModifiedUser is not null) payload.FileModifiedUserFrom1C = excelRecord.FileModifiedUser;
             if (excelRecord.Author is not null) payload.FileCreatedUser = excelRecord.Author;
-            if (excelRecord.CreationDate is not null) payload.FileChangeDateFrom1C = excelRecord.CreationDate;
+            if (excelRecord.CreationDate is not null) payload.FileCreatedDate1C = excelRecord.CreationDate;
             if (excelRecord.PathToFile is not null) payload.Name = Path.GetFileName(excelRecord.PathToFile);
             CreateFilePayloadRoot payloadRoot = new() { Context = payload };
             var jsonSerializerSettings = new JsonSerializerSettings

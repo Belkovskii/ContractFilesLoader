@@ -129,7 +129,7 @@ class Program
             var isFileAlreadyLoaded = await CheckFileUseCase.CheckIfFileInSystem(_httpClient, record.DocumentGuid);
             if (isFileAlreadyLoaded)
             {
-                return "error: file isalready loaded";
+                return "error: file is already loaded";
             }
             FileUploadData fileUploadData = new(_httpClient, record, contractId, pathToUploadFiles, _host, authToken);
             (bool uploadResult, string message) = await CreateFileUseCase.UploadContractFile(fileUploadData);

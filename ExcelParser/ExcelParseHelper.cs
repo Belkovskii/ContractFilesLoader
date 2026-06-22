@@ -70,6 +70,7 @@ namespace ContractLoader.ExcelParser
                 {
                     var fileGuid = row.Cell(2).Value.ToString();
                     results.TryGetValue(fileGuid, out string? message);
+                    Console.WriteLine($"при записи в файл обнаружен fileGuid {fileGuid} и результат {message}");
                     if (message is string)
                     {
                         row.Cell(30).SetValue(message);
