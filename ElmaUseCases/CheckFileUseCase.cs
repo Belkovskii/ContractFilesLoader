@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace ContractLoader.ElmaUseCases
 {
@@ -14,7 +14,7 @@ namespace ContractLoader.ElmaUseCases
             if (response.IsSuccessStatusCode)
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
-                FileApiResponse? apiResponse = JsonSerializer.Deserialize<FileApiResponse>(responseBody);
+                FileApiResponse? apiResponse = JsonConvert.DeserializeObject<FileApiResponse>(responseBody);
                 if (apiResponse is not null)
                 {
                     return apiResponse.result.total > 0;

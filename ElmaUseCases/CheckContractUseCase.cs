@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 
 namespace ContractLoader.ElmaUseCases
@@ -20,7 +20,7 @@ namespace ContractLoader.ElmaUseCases
                 var responseBody = await response.Content.ReadAsStringAsync();
                 if (responseBody is not null)
                 {
-                    ApiResponse? apiResponse = JsonSerializer.Deserialize<ApiResponse>(responseBody);
+                    ApiResponse? apiResponse = JsonConvert.DeserializeObject<ApiResponse>(responseBody);
                     if (apiResponse is not null)
                     {
                         if (apiResponse.result.total > 0 && apiResponse.result.result.Count > 0)
