@@ -93,7 +93,7 @@ class Program
     
     static async Task Proceed(ExcelParseHelper parser, string authToken)
     {
-        var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 50 };
+        var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 10 };
         var excelRecords = parser.Parse();
         var resultsConcurrentDictionary = new ConcurrentDictionary<string, string>();
         //foreach (var excelRecord in excelRecords)
