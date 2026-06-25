@@ -4,11 +4,12 @@
     {
         public static async Task<string> GetAuthToken(LoginAuthDataSet dataSet)
         {
+            Console.WriteLine($"dataSet.host: {dataSet.host}");
             LoginClient loginClient = new(dataSet.host, dataSet.client);
             var token = await loginClient.LoginAndGetToken(dataSet.username, dataSet.userPassword);
             if (token == null || token.Length < 5)
             {
-                Console.WriteLine("Не удалось получить токен");
+                Console.WriteLine("Did not manage to get token");
                 Console.ReadKey();
                 throw new Exception("Did not get token");
             }
@@ -17,12 +18,12 @@
             var authToken = await authClient.Auth(dataSet.isProd);
             if (!string.IsNullOrEmpty(authToken))
             {
-                Console.WriteLine("Логин и авторизация прошли успешно");
+                Console.WriteLine("Succesfully logged-in");
                 return authToken;
             }
             else
             {
-                Console.WriteLine("Произошла ошибка аутентификации");
+                Console.WriteLine("Got authentication error");
                 return "";
             }
         }

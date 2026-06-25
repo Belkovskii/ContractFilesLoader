@@ -29,6 +29,7 @@ namespace ContractLoader.ElmaUseCases
                 return (false, "no path to file in excel row");
             }
             string pathToFile = PathParser.GetPathToFile(generalPathToFiles, excelRecord.PathToFile);
+            Console.WriteLine($"pathToFile:{pathToFile}");
             FileUploadManager fileLoader = new(httpClient, token, host);
             (FileAttachment? fileAttachment, string resultMessage) = await fileLoader.GetFileBodyAndUpload(pathToFile);
             if (fileAttachment is not null)

@@ -13,55 +13,33 @@ class Program
     private static string pathToUploadFiles;
     private static string _host;
 
-    static Program()
-    {
-        //bearerToken = "bcf83280-631c-4ce6-8bf2-70cd49d79faa";
-        //_host = "https://l42bom5pymlbs.elma365.ru/";
-        //_httpClient = new()
-        //{
-        //    BaseAddress = new Uri("https://l42bom5pymlbs.elma365.ru/"),
-        //    Timeout = TimeSpan.FromSeconds(30),
-        //    DefaultRequestHeaders =
-        //    {
-        //        Authorization = new AuthenticationHeaderValue("Bearer", bearerToken)
-        //    }
-        //};
-        //loginAuthDataSet = new()
-        //{
-        //    host = _host,
-        //    client = _httpClient,
-        //    username = "denis.belkovsky@masterdata.ru",
-        //    userPassword = "Asz79!#58",
-        //    isProd = false
-        //};
-        //pathToExcelFile = "C:\\xlsx_files\\январь-декабрь2026.xlsx";
-        //pathToUploadFiles = "C:\\files_to_uload_to_contracts";
-        
-    }
+    static Program(){}
 
     static void Initialize()
     {
-        Console.Write("Введите bearer token для вашей системы: ");
-        bearerToken = Console.ReadLine();
+        var isTest = true;
+        if (!isTest) Console.Write("Input bearer token of your system: ");
+        bearerToken = isTest ? "9ebe84a2-369b-4e35-89e5-72104a85b6f3" : Console.ReadLine();
 
-        Console.Write("Введите host вашей системы (обязательно со знаком \\ в конце): ");
-        _host = Console.ReadLine();
+        if (!isTest) Console.Write("Input host of your system: ");
+        _host = isTest ? "https://contracting-dev.neadru.local/" : Console.ReadLine();
 
-        Console.Write("Введите ваш username: ");
-        var username = Console.ReadLine();
+        if (!isTest) Console.Write("Input your username: ");
+        var username = isTest ? "valentina.ivanova@logmol.ru" : Console.ReadLine();
 
-        Console.Write("Введите ваш password: ");
-        var userPassword = Console.ReadLine();
+        if (!isTest) Console.Write("Input your password: ");
+        var userPassword = isTest ? "Jc!i&t0YIz" : Console.ReadLine();
 
-        Console.Write("Если вы загружаете данные на prod, введите Y или y и нажмите enter (любой другой символ будет означать, что вы загружаете данные в dev среду с новым API Elma365): ");
-        var isProdInput = Console.ReadLine();
-        bool isProd = string.Equals(isProdInput, "Y", StringComparison.OrdinalIgnoreCase);
+        if (!isTest) Console.Write("Input Y or y for PROD or any key for other type of org): ");
+       // var isProdInput = Console.ReadLine();
+        //bool isProd = isTest ? "9ebe84a2-369b-4e35-89e5-72104a85b6f3" : string.Equals(isProdInput, "Y", StringComparison.OrdinalIgnoreCase);
+        bool isProd = true;
 
-        Console.Write("Введите путь до excel-файла с данными: ");
-        pathToExcelFile = Console.ReadLine();
+        if (!isTest) Console.Write("Input excel file path: ");
+        pathToExcelFile = isTest ? "D:\\Profiles\\belkovde\\Desktop\\loader\\январь-декабрь2026.xlsx" : Console.ReadLine();
 
-        Console.Write("Введите путь до общей папки, где лежат разделы по датам: ");
-        pathToUploadFiles = Console.ReadLine();
+        if (!isTest) Console.Write("Input files path: ");
+        pathToUploadFiles = isTest ? "F:\\Storage_do" : Console.ReadLine();
 
         _httpClient = new()
         {
@@ -79,16 +57,27 @@ class Program
             client = _httpClient,
             username = username,
             userPassword = userPassword,
-            isProd = isProd
+            isProd = false//isProd
         };
     }
 
     static async Task Main(string[] args)
     {
-        Initialize();
-        var authToken = await GetAuthTokenUseCase.GetAuthToken(loginAuthDataSet);
-        using ExcelParseHelper parser = new(pathToExcelFile);
-        await Proceed(parser, authToken);
+        try
+        {
+            Initialize();
+            var authToken = await GetAuthTokenUseCase.GetAuthToken(loginAuthDataSet);
+            using ExcelParseHelper parser = new(pathToExcelFile);        
+            await Proceed(parser, authToken);
+        } 
+        catch(Exception e)
+        {
+            Console.WriteLine($"final error: {e.ToString()}");
+        }
+        finally
+        {
+            Console.ReadKey();
+        }
     }
     
     static async Task Proceed(ExcelParseHelper parser, string authToken)

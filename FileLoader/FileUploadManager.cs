@@ -15,7 +15,9 @@ namespace ContractLoader.FileLoader
         async public Task<(FileAttachment?, string)> GetFileBodyAndUpload(string pathToFile)
         {
             string fileName = Path.GetFileName(pathToFile);
+            Console.WriteLine($"fileName:{fileName}");
             byte[] fileBody = File.ReadAllBytes(pathToFile);
+            Console.WriteLine($"fileBody:{fileBody.Length}");
             var (fileRecord, fileUploadError) = await UploadFile(fileBody, fileName);
             if (fileRecord is not null)
                 return (new FileAttachment(fileRecord), "success");
@@ -66,6 +68,7 @@ namespace ContractLoader.FileLoader
 
         public async Task<(FileCreationModel?, string)> UploadFile(byte[] fileBody, string fileName)
         {
+            Console.WriteLine("upload file");
             string uploadEndpoint = "";
             FileCreationModel fileCreationModel = new();
             var error = "";
